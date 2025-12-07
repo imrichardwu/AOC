@@ -35,7 +35,7 @@ class Solution:
         bottom_line = lines[-1]
         
         # Find maximum width
-        max_width = max(len(line.rstrip()) for line in top_lines) if top_lines else 0
+        max_width = max(len(line.rstrip()) for line in top_lines)
         
         # Pad all lines to same width
         grid = []
@@ -97,18 +97,17 @@ class Solution:
 if __name__ == "__main__":
     sol = Solution()
     
-    # # Test with example
-    # example_lines = [
-    #     "123 328  51 64 ",
-    #     " 45 64  387 23 ",
-    #     "  6 98  215 314",
-    #     "*   +   *   +  "
-    # ]
-    
-    # result = sol.main(example_lines)
-    # print(f"Example result: {result}")  # Should be 3263827
+    # Test with example
+    example_lines = [
+        "123 328  51 64 ",
+        " 45 64  387 23 ",
+        "  6 98  215 314",
+        "*   +   *   +  "
+    ]
+    result = sol.p1(example_lines)
 
     with open("input.txt", "r") as file:
         lines = file.readlines()
+        print(lines)
         result = sol.p1(lines)
         print(result)

@@ -18,10 +18,10 @@ class Solution:
         
         # Calculate result
         res = 0
-        for problem_nums, op in zip(nums, operations):
-            if op == '+':
+        for problem_nums, operation in zip(nums, operations):
+            if operation == '+':
                 total = sum(problem_nums)
-            elif op == '*':
+            elif operation == '*':
                 total = 1
                 for num in problem_nums:
                     total *= num
@@ -93,8 +93,6 @@ class Solution:
         
         return res
                    
-                
-
 if __name__ == "__main__":
     sol = Solution()
     

@@ -1,37 +1,66 @@
+from collections import deque
+
+from collections import deque
+
 class Solution:
-    def p1(self, lights, switches, joltages):
-        
+    def p1(self, lights, button, jolts):
+        goal = 0
+        for i, light in enumerate(lights):
+            if light == 1:
+                goal |= (1 << i)
+
+        masks = []
+        for group in button:
+            mask = 0
+            for i in group:
+                mask |= (1 << i) # Set the i-th bit
+            masks.append(mask)
+
+        queue = deque([(0, 0)])  # (current_state, steps)
+        seen = set([0])
+
+        while queue:
+            current, steps = queue.popleft()
+
+            if current == goal:
+                return steps   
+
+            for mask in masks:
+                next_state = current ^ mask
+                if next_state not in seen:
+                    seen.add(next_state)
+                    queue.append((next_state, steps + 1))
+
+        return 0
+
 if __name__ == "__main__":
-    sol = Solution()
-    lights, switchs, joltages = [], [], []
+    solution = Solution()
+    total_presses = 0
+    
     with open("input.txt", "r") as file:
         for line in file:
-            # Extract the indicator pattern (remove brackets)
-            start = line.find('[')
-            end = line.find(']')
-            pattern = line[start+1:end]
-            lights.append(pattern)
-            
-            # Extract button schematics (find all parentheses groups)
+            lightStr, rest = line.strip().split(" ", 1)
+            buttonStr, joltStr = rest.rsplit(" ", 1)
+
+            lights = []
+            for char in lightStr:
+                if char == "#":
+                    lights.append(1)
+                elif char == ".":
+                    lights.append(0)
+
             buttons = []
-            i = end + 1
-            while i < len(line):
-                if line[i] == '(':
-                    close = line.find(')', i)
-                    button_str = line[i+1:close]
-                    if button_str:  # if not empty
-                        button_indices = [int(x) for x in button_str.split(',')]
-                        buttons.append(button_indices)
-                    i = close + 1
-                elif line[i] == '{':
-                    # Extract joltage requirements
-                    close = line.find('}', i)
-                    joltage_str = line[i+1:close]
-                    joltage_values = [int(x) for x in joltage_str.split(',')]
-                    joltages.append(joltage_values)
-                    break
-                else:
-                    i += 1
-            switchs.append(buttons)
-    
-    print(sol.p1(lights, switchs, joltages))
+            for group in buttonStr.split():
+                group = group.strip("()")
+                if group:
+                    nums = [int(num) for num in group.split(",")]
+                    buttons.append(nums)
+
+            jolts = []
+            for jolt in joltStr.strip('{}').split(","):
+                jolts.append(int(jolt))
+
+            presses = solution.p1(lights, buttons, jolts)
+            total_presses += presses
+
+    print(total_presses)

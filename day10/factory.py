@@ -1,7 +1,8 @@
 from collections import deque
+import pulp
 
 class Solution:
-    def p1(self, lights, button, jolts):
+    def p1(self, lights, button):
         goal = 0
         for i, light in enumerate(lights):
             if light == 1:
@@ -33,6 +34,40 @@ class Solution:
                     queue.append((next_state, steps + 1))
 
         return 0
+    
+    def p2(self, buttons, jolts):
+        # Create ILP model
+        model = pulp.LpProblem("min_jolt_presses", pulp.LpMinimize)
+
+        # One integer variable per button
+        presses = []
+        for i in range(len(buttons)):
+            var = pulp.LpVariable(f"press_{i}", lowBound=0, cat=pulp.LpInteger)
+            presses.append(var)
+
+        # Objective function
+        model += pulp.lpSum(presses)
+
+        # Constraints, one per jolt index
+        for j, target in enumerate(jolts):
+            contributing = []
+            for k, group in enumerate(buttons):
+                if j in group:
+                    contributing.append(presses[k])
+            # Sum of all button presses that touch this jolt index must equal target
+            model += pulp.lpSum(contributing) == target
+
+        # Solve model
+        model.solve(pulp.PULP_CBC_CMD(msg=False))
+
+        # Get rounded integer
+        total = 0
+        for var in presses:
+            total += int(round(pulp.value(var)))
+
+        return total
+
+
 
 if __name__ == "__main__":
     solution = Solution()
@@ -61,7 +96,7 @@ if __name__ == "__main__":
             for jolt in joltStr.strip('{}').split(","):
                 jolts.append(int(jolt))
 
-            presses = solution.p1(lights, buttons, jolts)
+            presses = solution.p2(buttons, jolts)
             total_presses += presses
 
     print(total_presses)

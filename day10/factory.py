@@ -1,7 +1,5 @@
 from collections import deque
 
-from collections import deque
-
 class Solution:
     def p1(self, lights, button, jolts):
         goal = 0
@@ -9,24 +7,27 @@ class Solution:
             if light == 1:
                 goal |= (1 << i)
 
+        # Precompute button masks for efficiency
         masks = []
         for group in button:
             mask = 0
+            # Create a bitmask for each button group
             for i in group:
                 mask |= (1 << i) # Set the i-th bit
             masks.append(mask)
 
         queue = deque([(0, 0)])  # (current_state, steps)
         seen = set([0])
-
+        
+        # BFS to find the minimum button presses
         while queue:
-            current, steps = queue.popleft()
+            current, steps = queue.popleft() # current state and number of steps
 
             if current == goal:
                 return steps   
 
             for mask in masks:
-                next_state = current ^ mask
+                next_state = current ^ mask # Toggle the bits using XOR
                 if next_state not in seen:
                     seen.add(next_state)
                     queue.append((next_state, steps + 1))
